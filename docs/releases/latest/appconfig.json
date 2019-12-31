@@ -1,0 +1,6 @@
+{
+    "api": "./node_modules/@pvcp/planet-mocks/data/planetservices",
+    "apiPda": "./node_modules/@pvcp/planet-mocks/data/wristband",
+    "gtmId": "GTM-######",
+    "raven": "http://4b2940dcfdf1483e873b363df05d5e97@sentry.pvcp.intra:54160/##"
+}

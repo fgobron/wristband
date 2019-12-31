@@ -1,0 +1,7 @@
+{
+  "name": "wristband-expiration",
+  "short_name": "wbexp",
+  "description": "wristband expiration application",
+  "start_url": "/",
+  "display": "standalone"
+}

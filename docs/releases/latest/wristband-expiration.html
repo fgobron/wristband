@@ -13513,7 +13513,7 @@ AppLocalizeBehaviorImpl = {
  * @polymerBehavior
  */
 AppLocalizeBehavior = [AppLocalizeBehaviorImpl, Polymer.AppLocalizeBehavior];
-</script><dom-module id="app-tag-manager" assetpath="src/wristband-expiration-app/generic/">
+</script><dom-module id="app-tag-manager" assetpath="kiosk-components/generic/">
   <script>
     Polymer({
 
@@ -13537,9 +13537,8 @@ AppLocalizeBehavior = [AppLocalizeBehaviorImpl, Polymer.AppLocalizeBehavior];
         }
       },
       init: function() {
-        // TEMPORARY DISABLE Tags
-        //this._setDataLayer();
-        //this._setGtm();
+        this._setDataLayer();
+        this._setGtm();
       },
       _setDataLayer: function () {
         dataLayer = [{
@@ -13566,27 +13565,27 @@ AppLocalizeBehavior = [AppLocalizeBehaviorImpl, Polymer.AppLocalizeBehavior];
  * @polymerBehavior TagManagerBehavior
  */
 TagManagerBehavior = {
-  
-  trackEvent: function(category, action, label, event) {            
-    dataLayer.push({        
+
+  trackEvent: function(category, action, label, event) {
+    dataLayer.push({
       'eventCategory': category,
       'eventAction': action,
       'eventLabel': label,
       'event': event
-    });    
+    });
   },
   trackEventFromDataAttrs: function(e) {
     var target = e.currentTarget;
     var category = target.getAttribute('data-category');
     var action = target.getAttribute('data-action');
-    var label = target.getAttribute('data-label');    
+    var label = target.getAttribute('data-label');
     this.trackEvent(category, action, label, 'noevent');
   },
   setDataLayerItem: function(key, value) {
-    dataLayer.push({        
+    dataLayer.push({
       [key]: value
     });
-  }  
+  }
 };
 
 </script><!--
@@ -14101,6 +14100,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         c-0.865-0.867-2.271-0.867-3.137,0c-0.867,0.867-0.867,2.273,0,3.142l12.194,12.21L6.646,33.708c-0.867,0.868-0.867,2.273,0,3.142
         c0.433,0.434,1,0.65,1.569,0.65c0.566,0,1.133-0.217,1.567-0.65l12.195-12.211L34.174,36.85c0.433,0.434,1.001,0.65,1.569,0.65
         c0.566,0,1.135-0.217,1.566-0.65c0.866-0.868,0.866-2.273,0-3.142L25.114,21.498z"></path>
+      </g>
+      <g id="full">
+        <g transform="translate(6,6)">
+          <polygon points="29.414,26.586 22.828,20 20,22.828 26.586,29.414 24,32 32,32 32,24   "></polygon>
+          <polygon points="2.586,5.414 9.172,12 12,9.172 5.414,2.586 8,0 0,0 0,8   "></polygon>
+          <polygon points="26.586,2.586 20,9.172 22.828,12 29.414,5.414 32,8 32,0 24,0   "></polygon>
+          <polygon points="12,22.828 9.172,20 2.586,26.586 0,24 0,32 8,32 5.414,29.414   "></polygon>
+        </g>
       </g>
     </defs>
   </svg>
@@ -20049,7 +20056,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <p>[[localize('language_payment_desc')]]</p>
         <img src="images/cb.png">
       </div>
-      <p class="version">v0.0.2 - local mocks</p>
+      <p class="version">v0.0.3- local mocks</p>
     </div>
   </template>
 
@@ -21293,7 +21300,7 @@ event and do your own custom submission:
         </p>
         <div id="popcontainer"></div>
       </div>
-      <iron-ajax id="loginrequest" url="[[appconfig.apiPda]]/infos" handle-as="json" content-type="application/json" on-response="didReceiveResponse" on-error="fail">
+      <iron-ajax id="loginrequest" url="[[appconfig.apiPda]]/infos" method="GET" handle-as="json" content-type="application/json" on-response="didReceiveResponse" on-error="fail">
       </iron-ajax>
       <iron-meta-query id="appconfig" key="config" value="{{appconfig}}"></iron-meta-query>
   </div></template>
@@ -21322,7 +21329,7 @@ event and do your own custom submission:
         },
         _scanDuration: {
           type: Number,
-          value: 15
+          value: 30
         },
         _applicationId: {
           type: String,
@@ -21353,15 +21360,23 @@ event and do your own custom submission:
         return isNotEmpty && isNotAnErr;
       },
       scan: function() {
+
+        // TEMPORARY DEV SCAN
+        // this.$.chrono.start();
+        // this.async(function() {
+        //   this.set('uid', "123456");
+        //   this.$.chrono.stop();
+        //   this._successScan();
+        // }, 300);
+
         if (MBirdSdk.isConnected()) {
           this.$.chrono.start();
           // Start scanning
           MBirdSdk.Nfc.Read(this.get('_scanDuration')).then(function (result) {
             if (this._validResult(result)) {
-              //this.set('uid', result.ReadContent);
-              this.set('uid', "12345678910");
+              this.set('uid', "12343554");
               this.$.chrono.stop();
-
+              this._successScan();
             } else {
               this.fail();
             }
@@ -21369,9 +21384,11 @@ event and do your own custom submission:
             this.fail();
           }.bind(this));
         } else {
-          this.set('uid', "12345678910");
-          this._successScan();
           //this.fail();
+          this.$.chrono.start();
+          this.set('uid', "12343554");
+          this.$.chrono.stop();
+          this._successScan();
         }
       },
       fail: function () {
@@ -21390,13 +21407,14 @@ event and do your own custom submission:
         this.$.chrono.stop();
         this.$.chrono.reset();
         this.showPopIn(this.localize('login_nfc_error_title'), this.localize('login_nfc_error_line1'), this.localize('login_nfc_error_line2'), buttons, false);
+        this.trackEvent('Error', 'login error', this.localize('login_nfc_error_line1'), 'noevent');
       },
       retry: function() {
         this.scan();
       },
       reset: function() {
-        // reset api config
-        if (typeof globals.nfcApplicationId !== 'undefined' && globals.nfcApplicationId !== '') {
+         // reset api config
+         if (typeof globals.nfcApplicationId !== 'undefined' && globals.nfcApplicationId !== '') {
           this._applicationId = globals.nfcApplicationId;
         }
 
@@ -22165,7 +22183,7 @@ event and do your own custom submission:
     </template>
 
     <iron-meta-query id="appconfig" key="config" value="{{appconfig}}"></iron-meta-query>
-    <iron-ajax id="transactionrequest" handle-as="json" content-type="application/json" url="[[appconfig.apiPda]]/transaction" on-response="_onTransactionResponse" on-error="_onTransactionError"></iron-ajax>
+    <iron-ajax id="transactionrequest" method="GET" handle-as="json" content-type="application/json" url="[[appconfig.apiPda]]/transaction" on-response="_onTransactionResponse" on-error="_onTransactionError"></iron-ajax>
 
     <wristband-expiration-payment-error id="paymenterror" language="[[language]]" with-backdrop="" no-cancel-on-outside-click=""></wristband-expiration-payment-error>
     <wristband-expiration-printer-error id="printererror" language="[[language]]" with-backdrop="" no-cancel-on-outside-click=""></wristband-expiration-printer-error>
@@ -22179,6 +22197,7 @@ event and do your own custom submission:
         AppLocalizeBehavior,
         InfosBehavior,
         PrintBehavior,
+        TagManagerBehavior,
         PMRBehavior
       ],
       properties: {
@@ -22248,7 +22267,10 @@ event and do your own custom submission:
       pay: function () {
         var amount = this.get('amount');
         var transaction = this.get('transaction');
+
+        // TEMPORARY DEV PAY SHUNT
         amount = 0;
+
         if (amount !== 0) {
           if (MBirdSdk.isConnected()) {
             MBirdSdk.Payment.Pay(amount, transaction).then(function (result) {
@@ -22264,7 +22286,6 @@ event and do your own custom submission:
           // Bypass payment
           this.set('paymentInfo', []);
           this._setTransaction();
-          // this._fail();
         }
       },
       cancel: function () {
@@ -22303,11 +22324,24 @@ event and do your own custom submission:
       },
       _transactionFail: function () {
         this.set('state', 'partial');
+        this.trackEvent('Error', 'set transaction error', this.get('transactionId'), 'noevent');
         this._launchPrint();
       },
       _success: function () {
         this.set('state', 'success');
+        this._trackTransaction();
         this._launchPrint();
+      },
+      _trackTransaction: function () {
+        var layer = {
+          'eventCategory': 'Payment',
+          'eventAction': 'confirmation',
+          'eventLabel': 'transaction',
+          'event': 'noevent',
+          'transactionId': this.get('transactionId'),
+          'transactionTotal': this.formatPrice(this.get('amount'),2)
+        };
+        dataLayer.push(layer);
       },
       _isPrintInProgress: function (printState) {
         return printState === this.printStates.INPROGRESS;
@@ -22333,6 +22367,7 @@ event and do your own custom submission:
       _printFail: function () {
         //this.$.printererror.open();
         this.set('printState', this.printStates.ERROR);
+        this.trackEvent('Error', 'print error', this.localize('printer_error_title'), 'noevent');
       },
       _print: function () {
         if (MBirdSdk.isConnected()) {
@@ -22360,6 +22395,7 @@ event and do your own custom submission:
       },
       _fail: function () {
         this.$.paymenterror.open();
+        this.trackEvent('Error', 'payment error', this.localize('payment_error_title'), 'noevent');
       },
       _end: function () {
         if (MBirdSdk.isConnected()) {
@@ -23176,28 +23212,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <template is="dom-if" if="[[_isEqualTo(collection, 'full')]]">
       <app-toolbar id="toolbar" class$="[[_getPMRClass(pmr)]]">
-        <a href="#/lang">
+        <a href="#/lang" on-tap="_trackNavigation">
           <paper-button class$="first [[size]]">
             <iron-icon icon="tabbar:home"></iron-icon>
             <span class="button-content">[[localize('tabbar_home')]]</span>
             <span hidden$="[[!_isHighlighted('lang', highlightedPage)]]" class="highlighted"></span>
           </paper-button>
         </a>
-        <a href="#/nfcscan">
+        <a href="#/nfcscan" on-tap="_trackNavigation">
           <paper-button class$="[[size]]">
             <iron-icon icon="tabbar:wristband"></iron-icon>
             <span class="button-content">[[localize('tabbar_wristband')]]</span>
             <span hidden$="[[!_isHighlighted('nfcscan', highlightedPage)]]" class="highlighted"></span>
           </paper-button>
         </a>
-        <a href="#/help">
+        <a href="#/help" on-tap="_trackNavigation">
           <paper-button class$="[[size]]">
             <iron-icon icon="tabbar:help"></iron-icon>
             <span class="button-content">[[localize('tabbar_help')]]</span>
             <span hidden$="[[!_isHighlighted('help', highlightedPage)]]" class="highlighted"></span>
           </paper-button>
         </a>
-        <a hidden="[[!_isPmrAvailable()]]" on-tap="_togglePMRMode">
+        <a hidden="[[!_isPmrAvailable()]]" on-tap="_trackPMR">
           <paper-button class$="[[size]]">
             <iron-icon icon="[[_getIconPMR(pmr)]]"></iron-icon>
             <span class="button-content">[[_getPMRWording(localize, pmr)]]</span>
@@ -23285,9 +23321,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.set('pmr', true);
         }
       },
+      _trackPMR: function (e) {
+        e.preventDefault();
+        this.trackEvent('Language selection', 'pmr button', 'click', 'noevent');
+        this._togglePMRMode();
+      },
+      _trackNavigation: function (e) {
+        var target = e.currentTarget;
+        var tab = target.getAttribute('href').replace('#/', '');
+        this.trackEvent('Navigation bar', tab, 'click', 'noevent');
+      },
       _reset: function () {
         this.$.abandon.open();
         var path = globals.router.route.path.replace('/', '');
+        this.trackEvent('Navigation bar', 'abandon - ' + path, 'click', 'noevent');
       },
       _getIconPMR: function (pmr) {
         if (pmr) {
@@ -23324,7 +23371,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <app-tag-manager></app-tag-manager>
 
-    <iron-pages selected="[[_pageData.page]]" attr-for-selected="name" selected-attribute="visible" class$="[[_getPMRClass(pmr)]]">
+    <iron-pages selected="[[_pageData.page]]" attr-for-selected="name" selected-attribute="visible" on-iron-select="_pageSelected" class$="[[_getPMRClass(pmr)]]">
 
       <wristband-expiration-lang name="lang" language="[[language]]" pmr="[[pmr]]"></wristband-expiration-lang>
 
@@ -23442,7 +23489,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       } else {
         parent.document.getElementById('kiosk').classList.remove('pmr');
       }
-    }
+    },
+    _pageSelected: function(e) {
+      var page = e.detail.item;
+      var name = page.getAttribute('name');
+
+      // Tag
+      if(name === 'lang') {
+        // Start Session
+        this.async(function() {
+          this.trackEvent('Wristband-expiration', 'language selection', 'activate session', 'start');
+        }, 300);
+      }
+      if(name === 'outage') {
+        // Start Session outage
+        this.async(function() {
+          this.trackEvent('Wristband-expiration', 'outage', 'connectivity or peripherals default', 'end');
+        }, 300);
+      }
+    },
   });
 
   </script>

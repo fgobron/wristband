@@ -20056,7 +20056,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <p>[[localize('language_payment_desc')]]</p>
         <img src="images/cb.png">
       </div>
-      <p class="version">v0.0.3- local mocks</p>
+      <p class="version">v0.0.4 - local mocks</p>
     </div>
   </template>
 
@@ -21362,34 +21362,30 @@ event and do your own custom submission:
       scan: function() {
 
         // TEMPORARY DEV SCAN
-        // this.$.chrono.start();
-        // this.async(function() {
-        //   this.set('uid', "123456");
-        //   this.$.chrono.stop();
-        //   this._successScan();
-        // }, 300);
-
-        if (MBirdSdk.isConnected()) {
-          this.$.chrono.start();
-          // Start scanning
-          MBirdSdk.Nfc.Read(this.get('_scanDuration')).then(function (result) {
-            if (this._validResult(result)) {
-              this.set('uid', "12343554");
-              this.$.chrono.stop();
-              this._successScan();
-            } else {
-              this.fail();
-            }
-          }.bind(this)).catch(function (error) {
-            this.fail();
-          }.bind(this));
-        } else {
-          //this.fail();
-          this.$.chrono.start();
-          this.set('uid', "12343554");
+        this.$.chrono.start();
+        this.async(function() {
+          this.set('uid', "123456");
           this.$.chrono.stop();
           this._successScan();
-        }
+        }, 300);
+
+        // if (MBirdSdk.isConnected()) {
+        //   this.$.chrono.start();
+        //   // Start scanning
+        //   MBirdSdk.Nfc.Read(this.get('_scanDuration')).then(function (result) {
+        //     if (this._validResult(result)) {
+        //       this.set('uid', "12343554");
+        //       this.$.chrono.stop();
+        //       this._successScan();
+        //     } else {
+        //       this.fail();
+        //     }
+        //   }.bind(this)).catch(function (error) {
+        //     this.fail();
+        //   }.bind(this));
+        // } else {
+        //   this.fail();
+        // }
       },
       fail: function () {
         var buttons = [

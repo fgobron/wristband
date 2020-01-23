@@ -18636,7 +18636,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     </style>
 
-    <div on-tap="_navigateToAdmin">
+    <div on-tap="_reload">
       <p class="date">[[formatDate()]]</p>
       <p class="time">[[formatTime(time)]]</p>
     </div>
@@ -18657,17 +18657,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.set('date', moment());
         setInterval(this.updateTime.bind(this), 10000);
       },
-      _navigateToAdmin: function () {
-        if (this.tappedOneTime) {
-          window.location = "service-worker.html";
-          this.tappedOneTime = false;
-        }
-        this.tappedOneTime = true;
-        // reset flag after 800ms
-        this.async(function() {
-          this.tappedOneTime = false;
-        }, 800);
-      },
       formatTime: function (time) {
         return time.format('HH:mm');
       },
@@ -18676,6 +18665,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       formatDate: function () {
         return moment().format('DD-MM-YYYY');
+      },
+      _reload: function () {
+        document.location.reload(true);
       }
     });
 
@@ -20056,7 +20048,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <p>[[localize('language_payment_desc')]]</p>
         <img src="images/cb.png">
       </div>
-      <p class="version">v0.0.5 - local mocks</p>
+      <p class="version">v0.0.6 - reload</p>
     </div>
   </template>
 
